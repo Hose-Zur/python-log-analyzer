@@ -1,0 +1,26 @@
+#config file
+[tool.poetry]
+name = "python-log-analyzer"
+version ="0.0.1"
+description = "Narzędzie CLI do analizy logów HTTP (Apache/Nginx) z raportami i CI/CD."
+authors = ["Hubert Czernicki <hubert.cz060@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+package-mode = false  # <-- najprościej na start (aplikacja, nie biblioteka)
+
+
+[tool.poetry.dependencies]
+python = "^3.13"
+typer = "^0.16.0"       # CLI
+click = "^8.2.0"        # CLI (opcjonalnie, jeśli Typer używa w tle)
+
+[tool.poetry.group.dev.dependencies]
+#To samo, tylko dla zależności deweloperskich (np. testy, lintery, które nie są potrzebne w produkcji).
+pytest = "^8.4.1"  # testy jednostkowe
+ruff = "^0.5.0"    # linting
+mypy = "^1.11.0"   # opcjonalne typowanie
+bandit = "^1.7.9"  # opcjonalny skaner bezpieczeństwa
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
