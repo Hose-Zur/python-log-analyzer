@@ -1,0 +1,5 @@
+BADLINE this is not a valid access log at all
+93.184.216.34 - - [10/Oct/2023:99:99:99 +0200] "GET / HTTP/1.1" 200 512 "-" "UA"
+203.0.113.5 - - 10/Oct/2023:13:55:40 +0200 "GET /assets/style.css HTTP/1.1" 200 10240 "-" "UA"   # brak nawiasów []
+198.51.100.22 - - [10/Oct/2023:13:55:41 +0200] GET /favicon.ico HTTP/1.1 404 209 "-" "UA"       # brak cudzysłowów przy żądaniu
+93.184.216.34 - - [10/Oct/2023:13:55:45 +0200] "POST /login HTTP/1.1" 999 0 "-" "UA"             # status 999 (niestandardowy)
