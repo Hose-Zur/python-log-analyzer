@@ -1,7 +1,7 @@
 #config file
 [tool.poetry]
 name = "python-log-analyzer"
-version ="0.0.1"
+version ="0.0.2"
 description = "Narzędzie CLI do analizy logów HTTP (Apache/Nginx) z raportami i CI/CD."
 authors = ["Hubert Czernicki <hubert.cz060@gmail.com>"]
 license = "MIT"
