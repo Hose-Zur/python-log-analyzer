@@ -49,7 +49,9 @@ def test_limit_larger_than_file():
     """Sprawdza, że limit większy niż liczba linii zwraca wszystkie linie."""
     path = Path("data/access_small.log")
     lines = list(read_log_lines(path, limit=1000))
-    assert len(lines) == 13
+    with path.open(encoding="utf-8") as f:
+        expected = sum(1 for _ in f)
+    assert len(lines) == expected
 
 
 def test_empty_file(tmp_path):

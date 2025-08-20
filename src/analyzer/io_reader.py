@@ -1,37 +1,27 @@
-# === IO READER ===
-# Cel: strumieniowo czytać pliki logów linia po linii, z obsługą błędów i limitem.
+# === TESTY IO READER ===
+# Cel: zgodność z kontraktem read_log_lines.
 #
-# ✅ Wymagania:
-# - Wejście: ścieżka do pliku (Path), encoding (str), limit (Optional[int]).
-# - Sprawdź, czy plik istnieje i jest plikiem.
-# - Otwórz plik z danym encodingiem.
-# - Iteruj po liniach bez wczytywania całego pliku do pamięci.
-# - Jeśli limit > 0, zakończ po odczytaniu limitu linii.
-# - Rzucaj sensowne wyjątki przy problemach (np. FileNotFoundError).
-#
-# 🔒 Bezpieczeństwo / odporność:
-# - Nie zakładaj poprawnego kodowania — obsłuż UnicodeDecodeError (zaplanuj strategię).
-# - Dodaj krótkie logowanie błędów (później wpięte do loggera).
-#
-# 📌 Interfejs publiczny (do zrobienia):
-# - funkcja: read_log_lines(path: Path, encoding: str = "utf-8", limit: Optional[int] = None)
-#   - Zwraca iterator/generator linii.
-#
-# 🧪 Testy (patrz tests/test_io_reader.py):
-# - Gdy plik istnieje → zwraca poprawną liczbę linii.
-# - Gdy limit ustawiony → zwraca dokładnie `limit` linii.
-# - Gdy plik nie istnieje → odpowiedni wyjątek.
-# - Gdy błędne kodowanie → zdefiniowana reakcja (np. wyjątek lub fallback).
+# WYMAGANIA:
+# - Strumieniowość (nie testujemy pamięci, ale zakładamy iteracyjne API).
+# - Kolejność linii zachowana.
+# - Limit: None/0 -> całość, N -> N linii, N > len -> len.
+# - Błędy: brak pliku -> FileNotFoundError, limit < 0 -> ValueError.
+# - Kodowanie: jawne latin-1 działa; fallback z utf-8 -> latin-1 działa.
 #
 # TODO:
-# [ ] zaimportuj potrzebne rzeczy (pathlib.Path, typing.Optional)
-# [ ] zdefiniuj sygnaturę funkcji read_log_lines(...)
-# [ ] sprawdź istnienie pliku i poprawny typ (is_file)
-# [ ] otwórz plik w try/catch, obsłuż UnicodeDecodeError
-# [ ] iteruj po liniach (for ...), yield każdą linię
-# [ ] jeśli limit -> przerwij po N liniach
-# [ ] dodaj minimalne docstringi (opis parametrów i wyjątków)
-# [ ] (opcjonalnie) policz liczbę linii i zwróć w metadanych — na razie NIE, tylko linie
+# [x] test_lines_are_in_same_order
+# [x] test_limit_none_returns_all_lines
+# [x] test_limit_zero_returns_all_lines
+# [x] test_limit_one_returns_first_line
+# [x] test_limit_two_returns_two_lines
+# [x] test_limit_larger_than_file  # (unikaj stałej 13; policz dynam.)
+# [x] test_empty_file (tmp_path)
+# [x] test_file_not_found
+# [x] test_negative_limit_is_error
+# [x] test_explicit_encoding_latin1
+# [x] test_encoding_fallback_utf8_to_latin1
+# [ ] (opcjonalnie) test_permission_error (jeśli chcesz zasymulować)
+
 from pathlib import Path
 from typing import Optional, Iterator
 import logging

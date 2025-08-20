@@ -75,7 +75,6 @@ def app_callback(
         bool,
         typer.Option(
             "--version", help="Wyświetl wersję narzędzia i zakończ",
-            is_flag=True,
             is_eager=True, # Uruchom zanim wejdziemy w komendę
         )
     ] = False,
@@ -116,7 +115,7 @@ def main(
     top: Annotated[int, typer.Option("--top", help="Ilość pierwszych linijek.")] = 10,
     time_bucket: Annotated[str, typer.Option("--time-bucket", help="Jednostka grupowania czasu (hour/day)")] = "hour",
     fail_policy: Annotated[str, typer.Option("--fail-policy", help="Polityka błędów: skip/strict")] = "skip",
-    quiet: Annotated[bool, typer.Option("--quiet", help="Tryb cichy - minimum logów", is_flag=True)] = False,
+    quiet: Annotated[bool, typer.Option("--quiet", help="Tryb cichy - minimum logów")] = False,
 
     ):
 
