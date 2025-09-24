@@ -22,6 +22,8 @@ Krótki opis: narzędzie CLI do **parsowania** logów HTTP (Apache/Nginx), **agr
   - [Roadmapa / TODO](#roadmapa--todo)
   - [Czego się nauczyłem](#czego-się-nauczyłem)
   - [Licencja](#licencja)
+  - [Parser (Apache Combined)](#parser-apache-combined)
+    - [Przykład (fragment)](#przykład-fragment)
 
 ---
 
@@ -173,3 +175,28 @@ Krótki opis: narzędzie CLI do **parsowania** logów HTTP (Apache/Nginx), **agr
 
 ## Licencja
 MIT
+
+## Parser (Apache Combined)
+
+Parser obsługuje format **Apache Combined** i zwraca słownik z polami:
+`remote_host, identd, user, ts (UTC, tz‑aware), method, path, protocol, status, size, referrer, user_agent`.
+
+**Walidacje i normalizacje:**
+- `remote_host`: IPv4 (0–255 w oktetach); w przyszłości planowana obsługa hostnames/IPv6.
+- `ts`: `DD/Mon/YYYY:HH:MM:SS ±HHMM` → `datetime` w **UTC** (uwzględnia offset).
+- `method`: whitelist `{GET, POST, PUT, DELETE, HEAD, OPTIONS, PATCH, CONNECT, TRACE}`.
+- `status`: `100..599`.
+- `size`: liczba nieujemna lub `-` → `None`.
+- `protocol`: `HTTP/1.0`, `HTTP/1.1`, `HTTP/2`, `HTTP/3` lub `None`.
+- `referrer`, `user_agent`: `-` → `None`; obsługa escapowanych cudzysłowów.
+
+**Polityka błędów (`--fail-policy`)**
+- `skip` *(domyślnie)* — błędna linia jest pomijana; licznik błędów rośnie; **logger.warning** otrzymuje krótką diagnozę.
+- `strict` — program przerywa działanie (**ValueError** na pierwszej błędnej linii).
+
+### Przykład (fragment)
+Wejście (`data/access_small.log`):  
+– linie poprawne (200/404/302…),  
+– linie błędne w `data/corrupted.log` (np. brak `[]`, zła godzina `99`, `status=999`).  
+
+> Parser jest wpięty do CLI (lekcja 6); w tej lekcji (3) przygotowujemy kontrakt i testy.

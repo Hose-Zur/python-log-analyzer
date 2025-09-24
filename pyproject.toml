@@ -10,7 +10,7 @@ package-mode = false  # <-- najprościej na start (aplikacja, nie biblioteka)
 
 
 [tool.poetry.dependencies]
-python = "^3.13"
+python = "^3.11"
 typer = "^0.16.0"       # CLI
 click = "^8.2.0"        # CLI (opcjonalnie, jeśli Typer używa w tle)
 

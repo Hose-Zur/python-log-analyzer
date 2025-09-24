@@ -1,4 +1,4 @@
-93.184.216.34 - - [10/Oct/2023:13:55:36 +0200] "GET / HTTP/1.1" 200 512 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
+    93.184.216.34 - - [10/Oct/2023:13:55:36 +0200] "GET / HTTP/1.1" 200 512 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
 203.0.113.5 - - [10/Oct/2023:13:55:40 +0200] "GET /assets/style.css HTTP/1.1" 200 10240 "http://example.com/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64)"
 198.51.100.22 - - [10/Oct/2023:13:55:41 +0200] "GET /favicon.ico HTTP/1.1" 404 209 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)"
 93.184.216.34 - - [10/Oct/2023:13:55:45 +0200] "POST /login HTTP/1.1" 302 0 "http://example.com/login" "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
