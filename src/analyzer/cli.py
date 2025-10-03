@@ -1,31 +1,13 @@
-# === CLI ===
-# Cel: pobrać argumenty od użytkownika i uruchomić „pipeline”:
-# Reader -> (Parser -> Aggregator -> Reporter) — na razie tylko Reader.
-#
-# ✅ Wymagania z README (Specyfikacja CLI):
-# --input (wymagane, ścieżka)
-# --outdir (domyślnie ./reports)
-# --format (txt|csv|json; domyślnie txt)
-# --top (int; domyślnie 10)
-# --time-bucket (hour|day; domyślnie hour)
-# --limit (int; opcjonalnie)
-# --fail-policy (skip|strict; domyślnie skip)  # użyjesz w parserze
-# --encoding (domyślnie utf-8)
-# --quiet (flaga)
-# --version (flaga)
-#
-# 🧩 Na tym etapie (Lekcja 2):
-# - Użyj tylko: --input, --encoding, --limit (reszta placeholdery).
-# - Po odczycie kilku linii wypisz podsumowanie (np. liczbę wczytanych linii)
-#   albo po prostu policz je w zmiennej — NA RAZIE BEZ PARSOWANIA.
-#
-# 💡 Implementacyjnie sugeruję Typer (łatwiejszy niż argparse),
-#    ale jeśli nie chcesz go jeszcze używać — zrób placeholdery (komentarze).
-#
-# 🧪 Testy CLI (smoke) w tests/test_cli.py:
-# - uruchom CLI z poprawnym plikiem → proces wychodzi statusem 0
-# - uruchom z nieistniejącym plikiem → ≠ 0, krótki komunikat błędu
-#
+"""
+Zmiana (lekcja 3): przygotowanie integracji parsera.
+- W 'main(...)' po pętli read_log_lines(...) dodaj:
+  * wybór polityki błędów z --fail-policy (skip|strict),
+  * wywołanie parse_line(line, fail_policy=...),
+  * zliczanie: parsed_ok, parsed_bad,
+  * (opcjonalnie) preview pierwszych K sparsowanych rekordów w trybie nie-quiet.
+- Nie implementuj raportów — tylko tel. metryki i sumaryczny stdout.
+- Zostaw wyraźne TODO pod wpięcie 'aggregator' w lekcji 4.
+"""
 # TODO:
 # [ ] zaimportuj Typer (jeśli używasz) i Path (pathlib)
 # [ ] stwórz aplikację CLI (np. app = Typer()) — placeholder
@@ -42,6 +24,7 @@ from pathlib import Path
 from enum import Enum
 from typing import Optional
 from .io_reader import read_log_lines
+from .parser import parse_line
 
 
 # ===== Aplikacja =====
@@ -89,6 +72,10 @@ class ReportFormat(str, Enum):
     CSV = "csv"
     JSON = "json"
 
+class FailPolicy(str, Enum):
+    SKIP = "skip"
+    STRICT = "strict"
+
 @app.command()
 def main(
     input_path: Annotated[
@@ -108,13 +95,15 @@ def main(
         int,
         typer.Option("--limit", help="Limit linii (0 = bez limitu)")] = 0,
 
+    fail_policy: Annotated[
+        FailPolicy,
+        typer.Option("--fail-policy", help="Polityka błędów: skip/strict")] = FailPolicy.SKIP,
     # PlaceHoldery
     preview_cap: Annotated[int, typer.Option("--preview-cap", help="Podgląd: pokaż pierwsze N linii (0=wyłączone)")] = 0,
     outdir_path: Annotated[Path, typer.Option("--outdir", help="Katalog raportów")] = Path("./reports"),
     format: Annotated[ReportFormat, typer.Option(help="Format raportu: txt|csv|json")] = ReportFormat.TXT,
     top: Annotated[int, typer.Option("--top", help="Ilość pierwszych linijek.")] = 10,
     time_bucket: Annotated[str, typer.Option("--time-bucket", help="Jednostka grupowania czasu (hour/day)")] = "hour",
-    fail_policy: Annotated[str, typer.Option("--fail-policy", help="Polityka błędów: skip/strict")] = "skip",
     quiet: Annotated[bool, typer.Option("--quiet", help="Tryb cichy - minimum logów")] = False,
 
     ):
@@ -123,13 +112,52 @@ def main(
 
     try:
         count = 0
+        parsed_ok = 0
+        parsed_bad = 0
+        parsed_preview_shown = 0 #licznik sparsowanych pokazanych w podglądzie
+
+        # 1) weź "wartość" enuma albo zamień na string
+        policy = (fail_policy.value if isinstance(fail_policy, Enum) else str(fail_policy))
+        
+        # 2) zrób małe litery
+        policy = policy.lower()
+        
         for line in read_log_lines(input_path, encoding=encoding, limit=eff_limit):
             count += 1
-            if not quiet and count <= preview_cap:
+           
+            if not quiet and preview_cap > 0 and count <= preview_cap:
                 typer.echo(f"[{count}] {line}")
 
-        if not quiet:
-            typer.echo(f"Wczytano {count} linii z: {input_path}")
+            try:
+                rec = parse_line(line, fail_policy=policy)
+            
+                if rec is not None:
+                    parsed_ok +=1
+
+                    if not quiet and preview_cap > 0 and parsed_preview_shown < preview_cap: 
+                    #!r → używa repr(rec) (techniczny, „debugowy” zapis obiektu)
+                        typer.echo(f"[parsed {parsed_ok}] {rec!r}")
+                        parsed_preview_shown += 1
+                
+                else:
+                    parsed_bad += 1
+                    if policy == "strict":
+                        typer.echo(f"Błąd parsowania (None) w linii {count}", err=True)
+                        raise typer.Exit(code=1)
+            except Exception as e:
+                parsed_bad += 1
+                if policy == "strict":
+                    typer.echo(f"Błąd parsowania w linii {count}: {e}",  err=True)
+                    raise typer.Exit(code=1)
+                else:
+                    if not quiet:
+                        typer.echo(f"(skip) Błąd parsowania w linii {count}: {e}", err=True)
+
+                
+
+        typer.echo(f"Wczytano {count} linii z: {input_path}")
+        typer.echo(f"Poprawnie sparsowane: {parsed_ok}")
+        typer.echo(f"Błędnie sparsowane: {parsed_bad}")
 
         raise typer.Exit(code=0)
 

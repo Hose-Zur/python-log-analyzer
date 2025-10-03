@@ -63,3 +63,5 @@ Notatki dla użytkowników modułu:
   - API publiczne: parse_line (i opcjonalnie MAX_LINE_LEN). Rozważ __all__ = ["parse_line", "MAX_LINE_LEN"].
   - Parser jest stateless; bezpieczny do użycia w strumieniach/CLI oraz w środowisku wielowątkowym.
 """
+
+# ZAPLANUJ lepszy regex, aby np pobieral status 99, ale wtedy go odrzucal, po prostu zeby zgarnial wszystko a potem walidacja go odrzucala, czy to ipv6 trzeba ulepszyc czy inne rzeczy itd
