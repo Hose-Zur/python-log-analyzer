@@ -71,7 +71,7 @@ PRECOMPILED_COMBINED_RE = re.compile(
 
     # request line: "METHOD SP PATH [SP PROTOCOL]" (protocol optional)
     "
-        (?P<method>[A-Z]+)
+        (?P<method>[A-Za-z]+)
         \s+
         (?P<path>\S+)
         (?:\s+(?P<protocol>HTTP/\d(?:\.\d)?))?
@@ -311,7 +311,7 @@ def parse_line(line: str, fail_policy: str = "skip") -> dict | None:
         timestamp = parse_timestamp(groups["ts"])
 
         # Request-line fields
-        method = groups["method"]  # regex enforces [A-Z]+
+        method = groups["method"].upper()  # regex enforces [A-Za-z]+
         if method not in ALLOWED_HTTP_METHODS:
             raise ValueError("method: not allowed")
 
