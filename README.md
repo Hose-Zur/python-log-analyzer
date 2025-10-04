@@ -24,6 +24,7 @@ Krótki opis: narzędzie CLI do **parsowania** logów HTTP (Apache/Nginx), **agr
   - [Licencja](#licencja)
   - [Parser (Apache Combined)](#parser-apache-combined)
     - [Przykład (fragment)](#przykład-fragment)
+  - [Aggregator](#aggregator)
 
 ---
 
@@ -200,3 +201,22 @@ Wejście (`data/access_small.log`):
 – linie błędne w `data/corrupted.log` (np. brak `[]`, zła godzina `99`, `status=999`).  
 
 > Parser jest wpięty do CLI (lekcja 6); w tej lekcji (3) przygotowujemy kontrakt i testy.
+
+## Aggregator
+
+Warstwa agregacji przetwarza strumień rekordów zwróconych przez parser i utrzymuje liczniki:
+- **Top N IP** i **Top N ścieżek**,
+- **Rozkład statusów** (100–599) oraz **metod HTTP**,
+- **Histogram czasu** z krokiem `hour` lub `day`.
+
+**Kontrakt (API)**  
+Wewnętrznie korzystamy z klasy `StatsAggregator` z metodami:
+`ingest(record)`, `snapshot_top_ips(n)`, `snapshot_top_paths(n)`, `snapshot_status_counts()`,
+`snapshot_method_counts()`, `snapshot_time_histogram(bucket)`, `reset()`.
+
+**Założenia wydajnościowe i bezpieczeństwa**  
+Agregacja jest *online* – rekord po rekordzie, bez trzymania całych logów; pamięć rośnie ~O(unikatowych kluczy). Nie gromadzimy PII (UA/referrer) w licznikach. Brak `eval/exec`.
+
+**Użycie w CLI**  
+W tej lekcji przygotowaliśmy hooki w `cli.py` (TODO): po sparsowaniu linii wywoływana jest `ingest(...)`, a na końcu można wypisać podsumowanie (top‑N/status/metoda/histogram). Zapisy do plików (TXT/CSV/JSON) dodamy w **Lekcji 5**.
+
