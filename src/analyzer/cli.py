@@ -1,12 +1,13 @@
 """
-Zmiana (lekcja 3): przygotowanie integracji parsera.
-- W 'main(...)' po pętli read_log_lines(...) dodaj:
-  * wybór polityki błędów z --fail-policy (skip|strict),
-  * wywołanie parse_line(line, fail_policy=...),
-  * zliczanie: parsed_ok, parsed_bad,
-  * (opcjonalnie) preview pierwszych K sparsowanych rekordów w trybie nie-quiet.
-- Nie implementuj raportów — tylko tel. metryki i sumaryczny stdout.
-- Zostaw wyraźne TODO pod wpięcie 'aggregator' w lekcji 4.
+Lekcja 4 – Integracja Aggregatora (komentarze/TODO):
+- Utwórz StatsAggregator() przed pętlą.
+- Po parse_line(...): jeśli rec != None -> aggregator.ingest(rec)
+- Po pętli: zrób snapshoty (top-N IP/paths, status counts, method counts, histogram czasu)
+- Wypisz *krótkie* podsumowanie na stdout (zachowując 'quiet'); szczegóły i zapisy do plików będą w Lekcji 5.
+- Parametryzacja:
+    * użyj istniejących: --top, --time-bucket
+- Nie zmieniaj kodów wyjścia; błąd parsowania w 'strict' nadal kończy run.
+- BOM handling (TODO): jeśli encoding='utf-8' rozważ 'utf-8-sig' albo stripping BOM w io_reader.
 """
 # TODO:
 # [ ] zaimportuj Typer (jeśli używasz) i Path (pathlib)
