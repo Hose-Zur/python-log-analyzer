@@ -19,9 +19,16 @@ click = "^8.2.0"        # CLI (opcjonalnie, jeśli Typer używa w tle)
 [tool.poetry.group.dev.dependencies]
 #To samo, tylko dla zależności deweloperskich (np. testy, lintery, które nie są potrzebne w produkcji).
 pytest = "^8.4.1"  # testy jednostkowe
+pytest-cov = "^5.0.0"
+black = "^24.4.0"
 ruff = "^0.5.0"    # linting
 mypy = "^1.11.0"   # opcjonalne typowanie
 bandit = "^1.7.9"  # opcjonalny skaner bezpieczeństwa
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+testpaths = ["tests"]
+addopts = "-q -ra"
 
 [build-system]
 requires = ["poetry-core"]
